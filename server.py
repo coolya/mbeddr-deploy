@@ -3,23 +3,17 @@
 from __future__ import unicode_literals
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-import json, os, hmac, hashlib
+import json, os, requests
 
 DEBUG = False
 EXEC_CMD = os.getenv('EXEC_CMD', 'echo foo')
 
 class GitAutoDeploy(BaseHTTPRequestHandler):
     def do_POST(self):
-        try:
             self.handleStuff()
-        except:
-            pass
-
-    def log_message(self, format, *args):
-        return
 
     def handleStuff(self):
-        try:
+
             length = int(self.headers.getheader('content-length'))
             body = self.rfile.read(length)
             data = json.loads(body)
@@ -46,15 +40,14 @@ class GitAutoDeploy(BaseHTTPRequestHandler):
                 print('callback url:')
                 print(cburl)
             r = requests.post(cburl, data=json.dumps(cbdata))
-        except:
-            print("Error")
+
 
 def main():
     try:
         server = None
-        print('KurzDNS GitHub Autodeploy Service Thing v1.0.1-ultrastable started.')
+        print('Mbeddr deploy helper started')
         server = HTTPServer(('', 8001), GitAutoDeploy)
-        server.handle_one_request()
+        server.handle_request()
     except(KeyboardInterrupt, SystemExit) as e:
         if server:
             server.socket.close()
